@@ -1,0 +1,25 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\authController;
+use App\Http\Controllers\SocialController;
+use App\Http\Controllers\Api\QuerryController;
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+
+*/
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/fetch-movie', function () {
+    \App\Jobs\FetchMoviesFromOMDb::dispatch('tt3896198'); // Guardians of the Galaxy Vol. 2
+    return 'Job Dispatched! Check logs or database.';
+});

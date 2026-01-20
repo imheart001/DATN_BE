@@ -1,0 +1,20 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Time;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class TimeFactory extends Factory
+{
+    protected $model = Time::class;
+
+    public function definition()
+    {
+        return [
+            'time' => fake()->time('H:i'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+    }
+}
