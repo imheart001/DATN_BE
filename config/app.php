@@ -145,13 +145,6 @@ return [
         // 'store'  => 'redis',
     ],
 
-    'providers' => [
-        // ...
-        App\Providers\BroadcastServiceProvider::class,
-        Barryvdh\DomPDF\ServiceProvider::class,
-        Laravel\Passport\PassportServiceProvider::class,
-    ],
-
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -173,10 +166,11 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Laravel\Passport\PassportServiceProvider::class,
     ])->toArray(),
 
     /*

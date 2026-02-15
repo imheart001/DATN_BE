@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\FilmController;
 use App\Http\Controllers\Api\FoodController;
 use App\Http\Controllers\Api\TimeController;
 use App\Http\Controllers\Api\BlogsController;
+use App\Http\Controllers\Api\BookingShowtimeController;
 use App\Http\Controllers\Api\PhotoController;
 use App\Http\Controllers\Api\UsersController;
 use App\Http\Controllers\Api\BannerController;
@@ -83,6 +84,7 @@ Route::get('/rating_avgs',[RateStarController::class, 'ratingAvg']); // đánh g
 
 //////
 Route::get('film_cinema/{id}', [QuerryController::class, 'film_cinema']);  // Lấy thông tin phim theo rạp 
+Route::get('showtimes/booking', [BookingShowtimeController::class, 'index']);
 Route::get('time_detail_get_by_id/{id}', [QuerryController::class, 'time_detail_get_by_id']);
 Route::get('check_time_detail_by_film_id/{id_cinema}', [QuerryController::class, 'check_time_detail_by_film_id']); /////
 Route::get('time_detail_film', [QuerryController::class, 'check_time_detail_by_film']); /////
