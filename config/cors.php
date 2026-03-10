@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'paths' => ['api/*','api/getReservedSeatsByTimeDetail','api/cache_seat','api/Book_ticket'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
