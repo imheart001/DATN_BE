@@ -149,15 +149,19 @@ class QuerryController extends Controller
         }
         // Đặt lại dữ liệu vào Cache
         Cache::put('seat_reservation', $seat_reservation);
-        $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
-            'useTLS' => true,
-        ]);
+        try {
+            $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ]);
 
-        $pusher->trigger('Cinema', 'check-Seat', [
-            $seat_reservation[$id_time_detail],
+            $pusher->trigger('Cinema', 'check-Seat', [
+                $seat_reservation[$id_time_detail],
+            ]);
+        } catch (\Exception $e) {
+            \Log::warning('Pusher notification failed: ' . $e->getMessage());
+        }
 
-        ]);
         return $seat_reservation[$id_time_detail];
         // Trả về dữ liệu ghế và thời gian đã đặt
 
@@ -185,16 +189,19 @@ class QuerryController extends Controller
             }
         }
 
-        $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
-            'useTLS' => true,
-        ]);
-        $pusher->trigger(
-            'Cinema',
-            'SeatKepted',
-            $reservedSeats,
-
-        );
+        try {
+            $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ]);
+            $pusher->trigger(
+                'Cinema',
+                'SeatKepted',
+                $reservedSeats,
+            );
+        } catch (\Exception $e) {
+            \Log::warning('Pusher notification failed: ' . $e->getMessage());
+        }
 
         return $reservedSeats;
         // Move the dd() here if you want to see the final value of $seat

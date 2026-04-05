@@ -5,6 +5,7 @@ namespace App\Models;
 use Pusher\Pusher;
 use App\Models\Chairs;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes; // add soft delete
@@ -73,14 +74,21 @@ class Book_ticket extends Model
                 }
             }}
     Cache::put('seat_reservation', $seat_reservation);
-        $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
-            'useTLS' => true,
-        ]);
-        $pusher->trigger(
-            'Cinema',
-            'SeatKepted',
-            $reservedSeats,
-        );
+        
+        // Wrap Pusher call in try-catch to prevent payment failures
+        try {
+            $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            ]);
+            $pusher->trigger(
+                'Cinema',
+                'SeatKepted',
+                $reservedSeats,
+            );
+        } catch (\Exception $e) {
+            // Log the error but don't fail the booking process
+            Log::warning('Pusher notification failed: ' . $e->getMessage());
+        }
 }
 }

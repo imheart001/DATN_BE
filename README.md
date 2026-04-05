@@ -53,6 +53,30 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
+## Native Windows Setup
+
+This project also supports a Windows-native development workflow without Docker.
+
+1. Install required tools:
+   - PHP 8.1+ with `pdo_mysql`, `openssl`, `mbstring`, `tokenizer`, `xml`, `zip`, `json`, `fileinfo`
+   - Composer
+   - Node.js 18+ and npm
+   - MySQL 8
+   - Optional: Redis 7 for local Redis-based queues and caching
+
+2. From the repo root, run:
+   - `pwsh .\setup-windows.ps1`
+   - `pwsh .\setup-windows.ps1 -Build` to also build Vite assets
+   - `pwsh .\setup-windows.ps1 -Dev` to start the Vite dev server
+
+3. If `.env` exists, the script preserves it; otherwise it copies `.env.example` to `.env`.
+
+4. After the script completes, start the app with:
+   - `php artisan serve --host=127.0.0.1 --port=8000`
+   - Open `http://127.0.0.1:8000`
+
+5. If the app needs local email testing, configure `.env` for Mailpit or another SMTP provider.
+
 ## Code of Conduct
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).

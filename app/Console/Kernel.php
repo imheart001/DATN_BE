@@ -78,15 +78,19 @@ class Kernel extends ConsoleKernel
                                         ];
                                     }
                                 }}
-                            $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
-                                'cluster' => env('PUSHER_APP_CLUSTER'),
-                                'useTLS' => true,
-                            ]);
-                            $pusher->trigger(
-                                'Cinema',
-                                'SeatKepted',
-                                $reservedSeats,
-                            );
+                            try {
+                                $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
+                                    'cluster' => env('PUSHER_APP_CLUSTER'),
+                                    'useTLS' => true,
+                                ]);
+                                $pusher->trigger(
+                                    'Cinema',
+                                    'SeatKepted',
+                                    $reservedSeats,
+                                );
+                            } catch (\Exception $e) {
+                                \Log::warning('Pusher notification failed: ' . $e->getMessage());
+                            }
                             
                         }
                     }

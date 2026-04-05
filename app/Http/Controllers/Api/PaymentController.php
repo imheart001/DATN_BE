@@ -82,7 +82,7 @@ class PaymentController extends Controller
         date_default_timezone_set('Asia/Ho_Chi_Minh');
         $startTime = date("YmdHis");
         $expire = date('YmdHis', strtotime('+50 minutes', strtotime($startTime)));
-        $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        $vnp_Url = env('VNPAY_URL', 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
         $vnp_Returnurl = "http://localhost:5173/payment/id_code=" . $id_code . '/'; // Đường dẫn return sau khi thanh toán
 
 
@@ -90,8 +90,8 @@ class PaymentController extends Controller
                 $vnp_Returnurl = "http://localhost:5173/ResultNapTien/id_code=" . $id_code . '/'; // Đường dẫn return sau khi thanh toán
     
             }
-            $vnp_TmnCode = "SMWBPLOI"; //Mã website tại VNPAY 
-            $vnp_HashSecret = "YCXCIZUKOICUEMGAZGIFLYLLNULOSTTK"; //Chuỗi bí mật
+            $vnp_TmnCode = env('VNPAY_TMN_CODE', '8F3ICW7B'); //Mã website tại VNPAY 
+            $vnp_HashSecret = env('VNPAY_HASH_SECRET', '3SIIKH90C8I7VF9HL0WKB4MCU1OV3UID'); //Chuỗi bí mật
             $vnp_TxnRef = $startTime; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
             $vnp_OrderInfo = 'Thanh toán hóa đơn';
             $vnp_OrderType = 'billpayment';
