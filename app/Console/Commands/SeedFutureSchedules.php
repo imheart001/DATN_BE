@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\TimeDetail;
 use App\Models\Time;
 use App\Models\Film;
+use App\Models\FilmRelease;
 use App\Models\MovieRoom;
 use Carbon\Carbon;
 
@@ -68,10 +69,26 @@ class SeedFutureSchedules extends Command
                 $dailySessions = rand(2, 4);
 
                 for ($i = 0; $i < $dailySessions; $i++) {
+                    // Find the matching film_release for this film
+                    $filmRelease = FilmRelease::where('film_id', $film->id)
+                        ->where('release_date', '<=', $date->toDateString())
+                        ->where('end_date', '>=', $date->toDateString())
+                        ->whereNull('deleted_at')
+                        ->first();
+
+                    // Fallback to latest release if no matching one found
+                    if (!$filmRelease) {
+                        $filmRelease = FilmRelease::where('film_id', $film->id)
+                            ->whereNull('deleted_at')
+                            ->latest('release_date')
+                            ->first();
+                    }
+
                     TimeDetail::create([
                         'date' => $date->toDateString(),
                         'time_id' => $times->random()->id,
                         'film_id' => $film->id,
+                        'film_release_id' => $filmRelease?->id,
                         'room_id' => $rooms->random()->id,
                         'created_at' => now(),
                         'updated_at' => now(),

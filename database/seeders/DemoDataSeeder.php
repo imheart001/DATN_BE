@@ -30,6 +30,9 @@ class DemoDataSeeder extends Seeder
             $filmIds = $this->seedFilms();
             $counts['films'] = count($filmIds);
 
+            $filmReleaseIds = $this->seedFilmReleases($filmIds);
+            $counts['film_releases'] = count($filmReleaseIds);
+
             $counts['category_details'] = $this->seedCategoryDetails($categoryIds, $filmIds);
             $counts['cinema_details'] = $this->seedCinemaDetails($cinemaIds, $filmIds);
 
@@ -40,7 +43,7 @@ class DemoDataSeeder extends Seeder
             $counts['users'] = count($userIds);
             $counts['members'] = $this->seedMembers($userIds);
 
-            $timeDetailIds = $this->seedTimeDetails($roomIds, $filmIds, $timeIds);
+            $timeDetailIds = $this->seedTimeDetails($roomIds, $filmIds, $timeIds, $filmReleaseIds);
             $counts['time_details'] = count($timeDetailIds);
 
             $chairIds = $this->seedBookedChairs($timeDetailIds);
@@ -274,22 +277,44 @@ class DemoDataSeeder extends Seeder
         return count($customers);
     }
 
-    private function seedTimeDetails(array $roomIds, array $filmIds, array $timeIds): array
+    private function seedTimeDetails(array $roomIds, array $filmIds, array $timeIds, array $filmReleaseIds): array
     {
         $roomValues = array_values($roomIds);
         $filmValues = array_values($filmIds);
         $timeValues = array_values($timeIds);
+        $releaseValues = array_values($filmReleaseIds);
         $ids = [];
 
         for ($i = 0; $i < 10; $i++) {
             $date = $this->now->copy()->addDays(intdiv($i, 2))->toDateString();
             $key = "demo-showtime-{$i}";
+            $filmId = $filmValues[$i % count($filmValues)];
+
+            // Find matching film_release_id for this film_id
+            $matchingReleaseId = null;
+            foreach ($filmReleaseIds as $relKey => $relId) {
+                // The first release keys are like 'lat-mat-demo-r1', etc.
+                $filmSlug = str_replace(['-r1', '-r2'], '', $relKey);
+                $filmKeys = array_keys($filmIds);
+                $filmIndex = $i % count($filmValues);
+                if (isset($filmKeys[$filmIndex])) {
+                    $targetSlug = $filmKeys[$filmIndex];
+                    if (str_starts_with($relKey, $targetSlug . '-r')) {
+                        $matchingReleaseId = $relId;
+                        break; // Take the first matching release
+                    }
+                }
+            }
+
             $ids[$key] = $this->upsert('time_details', [
                 'date' => $date,
                 'time_id' => $timeValues[$i % count($timeValues)],
-                'film_id' => $filmValues[$i % count($filmValues)],
+                'film_id' => $filmId,
                 'room_id' => $roomValues[$i % count($roomValues)],
-            ], ['deleted_at' => null]);
+            ], [
+                'film_release_id' => $matchingReleaseId,
+                'deleted_at' => null,
+            ]);
         }
 
         return $ids;
@@ -558,6 +583,45 @@ class DemoDataSeeder extends Seeder
         }
 
         return count($names);
+    }
+
+    private function seedFilmReleases(array $filmIds): array
+    {
+        $ids = [];
+        $filmKeys = array_keys($filmIds);
+
+        foreach ($filmIds as $slug => $filmId) {
+            // Create the initial release (matching the film's own dates)
+            $film = DB::table('films')->where('id', $filmId)->first();
+            if (!$film) continue;
+
+            $ids[$slug . '-r1'] = $this->upsert('film_releases', [
+                'film_id' => $filmId,
+                'release_date' => $film->release_date,
+            ], [
+                'end_date' => $film->end_date,
+                'label' => 'Khởi chiếu lần 1',
+                'note' => 'Tự động tạo từ DemoDataSeeder',
+                'deleted_at' => null,
+            ]);
+        }
+
+        // Add re-releases for 2 demo films
+        $reReleaseFilms = array_slice($filmKeys, 0, 2);
+        foreach ($reReleaseFilms as $index => $slug) {
+            $filmId = $filmIds[$slug];
+            $ids[$slug . '-r2'] = $this->upsert('film_releases', [
+                'film_id' => $filmId,
+                'release_date' => $this->now->copy()->addDays(30 + $index * 5)->toDateString(),
+            ], [
+                'end_date' => $this->now->copy()->addDays(60 + $index * 5)->toDateString(),
+                'label' => 'Khởi chiếu lại',
+                'note' => 'Demo re-release cho phần thống kê doanh thu theo đợt',
+                'deleted_at' => null,
+            ]);
+        }
+
+        return $ids;
     }
 
     private function upsert(string $table, array $match, array $values): int

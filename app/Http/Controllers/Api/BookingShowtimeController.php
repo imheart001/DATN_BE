@@ -46,6 +46,7 @@ class BookingShowtimeController extends Controller
             ->join('cinemas as c', 'c.id', '=', 'mr.id_cinema')
             ->join('films as f', 'f.id', '=', 'td.film_id')
             ->join('times as t', 't.id', '=', 'td.time_id')
+            ->leftJoin('film_releases as fr', 'fr.id', '=', 'td.film_release_id')
             ->leftJoin(
                 DB::raw(
                     '(SELECT id_time_detail, COUNT(*) as booked_seats FROM movie_chairs WHERE deleted_at IS NULL GROUP BY id_time_detail) as chair_counts'
@@ -64,8 +65,20 @@ class BookingShowtimeController extends Controller
             ->where('c.status', 1)
             ->where('f.status', 1)
             ->whereBetween('td.date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->whereColumn('f.release_date', '<=', 'td.date')
-            ->whereColumn('f.end_date', '>=', 'td.date');
+            ->where(function ($dateQuery) {
+                // If time_detail has a film_release_id, check against the release dates
+                $dateQuery->where(function ($sub) {
+                    $sub->whereNotNull('td.film_release_id')
+                        ->whereColumn('fr.release_date', '<=', 'td.date')
+                        ->whereColumn('fr.end_date', '>=', 'td.date');
+                })
+                // Fallback: check against the film's own dates (backward compatible)
+                ->orWhere(function ($sub) {
+                    $sub->whereNull('td.film_release_id')
+                        ->whereColumn('f.release_date', '<=', 'td.date')
+                        ->whereColumn('f.end_date', '>=', 'td.date');
+                });
+            });
 
         if ($filmId !== null) {
             $showtimes->where('td.film_id', $filmId);

@@ -212,10 +212,15 @@ class RevenueController extends Controller
         $revenue_month_y = $query->sum('amount');
         // Tính ngày bắt đầu của tháng
         $today = now();
-        $released_film_num = DB::table('films')
-            ->where('release_date', '<=', $today)
-            ->where('end_date', '>=', $today)
-            ->count();
+        // Đếm phim đang chiếu dựa trên film_releases (hỗ trợ re-release)
+        $released_film_num = DB::table('film_releases')
+            ->join('films', 'films.id', '=', 'film_releases.film_id')
+            ->where('film_releases.release_date', '<=', $today)
+            ->where('film_releases.end_date', '>=', $today)
+            ->whereNull('film_releases.deleted_at')
+            ->whereNull('films.deleted_at')
+            ->distinct('film_releases.film_id')
+            ->count('film_releases.film_id');
         $count_food = DB::table('food')->count();
         $count_cinema =  DB::table('cinemas')->where('status', 1)->count();
         $ticket_day =  $this->QueryRevenue($year)
@@ -787,5 +792,99 @@ class RevenueController extends Controller
             'tickets_total_day' => $tickets_total_day, // xem tên nhân viên và số lượng vé check-in
             'revenue_food' => $revenue_food // thống kê đồ ăn
         ]];
+    }
+
+    /**
+     * Doanh thu theo từng đợt chiếu của phim.
+     * Input: film_id (required), film_release_id (optional)
+     */
+    public function revenueByRelease(Request $request)
+    {
+        $filmId = $request->film_id;
+        $filmReleaseId = $request->film_release_id;
+        $year = $request->year ?? date('Y');
+
+        if (!$filmId) {
+            return response()->json(['message' => 'film_id là bắt buộc'], 422);
+        }
+
+        // Lấy danh sách đợt chiếu
+        $releasesQuery = DB::table('film_releases')
+            ->where('film_id', $filmId)
+            ->whereNull('deleted_at');
+
+        if ($filmReleaseId) {
+            $releasesQuery->where('id', $filmReleaseId);
+        }
+
+        $releases = $releasesQuery->orderBy('release_date', 'desc')->get();
+
+        $result = [];
+        foreach ($releases as $release) {
+            // Doanh thu vé cho đợt chiếu này
+            $ticketRevenue = DB::table('book_tickets')
+                ->join('time_details', 'book_tickets.id_time_detail', '=', 'time_details.id')
+                ->where('time_details.film_release_id', $release->id)
+                ->where('book_tickets.status', '<>', 2)
+                ->whereNull('book_tickets.deleted_at')
+                ->sum('book_tickets.amount');
+
+            // Doanh thu đồ ăn cho đợt chiếu này
+            $foodRevenue = DB::table('food_ticket_details')
+                ->join('food', 'food_ticket_details.food_id', '=', 'food.id')
+                ->join('book_tickets', 'food_ticket_details.book_ticket_id', '=', 'book_tickets.id')
+                ->join('time_details', 'book_tickets.id_time_detail', '=', 'time_details.id')
+                ->where('time_details.film_release_id', $release->id)
+                ->where('book_tickets.status', '<>', 2)
+                ->whereNull('book_tickets.deleted_at')
+                ->whereNull('food_ticket_details.deleted_at')
+                ->sum(DB::raw('food_ticket_details.quantity * food.price'));
+
+            // Số vé bán
+            $ticketCount = DB::table('book_tickets')
+                ->join('time_details', 'book_tickets.id_time_detail', '=', 'time_details.id')
+                ->where('time_details.film_release_id', $release->id)
+                ->where('book_tickets.status', '<>', 2)
+                ->whereNull('book_tickets.deleted_at')
+                ->count();
+
+            // Số vé hoàn
+            $refundCount = DB::table('book_tickets')
+                ->join('time_details', 'book_tickets.id_time_detail', '=', 'time_details.id')
+                ->where('time_details.film_release_id', $release->id)
+                ->where('book_tickets.status', 2)
+                ->whereNull('book_tickets.deleted_at')
+                ->count();
+
+            $refundAmount = DB::table('book_tickets')
+                ->join('time_details', 'book_tickets.id_time_detail', '=', 'time_details.id')
+                ->where('time_details.film_release_id', $release->id)
+                ->where('book_tickets.status', 2)
+                ->whereNull('book_tickets.deleted_at')
+                ->sum(DB::raw('ROUND(0.3 * book_tickets.amount, 0)'));
+
+            $result[] = [
+                'release_id' => $release->id,
+                'label' => $release->label,
+                'release_date' => $release->release_date,
+                'end_date' => $release->end_date,
+                'note' => $release->note,
+                'ticket_revenue' => intval($ticketRevenue),
+                'food_revenue' => intval($foodRevenue),
+                'total_revenue' => intval($ticketRevenue) + intval($foodRevenue),
+                'ticket_count' => $ticketCount,
+                'refund_count' => $refundCount,
+                'refund_amount' => intval($refundAmount),
+            ];
+        }
+
+        // Tổng doanh thu tất cả đợt chiếu
+        $grandTotal = array_sum(array_column($result, 'total_revenue'));
+
+        return response()->json([
+            'film_id' => $filmId,
+            'grand_total' => $grandTotal,
+            'releases' => $result,
+        ]);
     }
 }

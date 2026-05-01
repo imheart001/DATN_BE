@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\UservoucherController;
 use App\Http\Controllers\Api\Contact_infosController;
 use App\Http\Controllers\Api\CategoryDetailController;
 use App\Http\Controllers\Api\ForgotPasswordController;
+use App\Http\Controllers\Api\FilmReleaseController;
 use App\Http\Controllers\Api\Food_ticket_detailController;
 /*u
 |--------------------------------------------------------------------------
@@ -105,6 +106,7 @@ Route::get('QR_book/{id}', [QuerryController::class, 'QR_book_tiket']);
 Route::post('Revenue', [RevenueController::class, 'Revenue']);
 Route::post('Revenue_cinema', [RevenueController::class, 'Revenue_cinema']);
 Route::post('Revenue_cinema_staff', [RevenueController::class, 'Revenue_cinema_staff']);
+Route::post('Revenue_by_release', [RevenueController::class, 'revenueByRelease']);
 Route::get('getShiftRevenue/{id}', [QuerryController::class, 'getShiftRevenue']);
 Route::get('get_used_vouchers_by_id_user/{id}', [QuerryController::class, 'get_used_vouchers_by_id_user']); // lấy voucher sử dụng r
 Route::get('get_room_by_id_cinema/{id}', [QuerryController::class, 'get_room_by_id_cinema']);
@@ -139,6 +141,7 @@ Route::resource('filmMaker', FilmMakersController::class);
 Route::resource('movieRoom', MovieRoomController::class);
 
 Route::resource('film', FilmController::class);
+Route::apiResource('film.releases', FilmReleaseController::class);
 
 Route::resource('user', UsersController::class);
 // //api add vocher

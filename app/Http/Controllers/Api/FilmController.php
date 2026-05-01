@@ -6,6 +6,7 @@ use App\Models\Film;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FilmResource;
+use App\Models\FilmRelease;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -40,6 +41,16 @@ class FilmController extends Controller
         }
         $films = film::create($data);
 
+        // Auto-create the first film release
+        if (isset($data['release_date']) && isset($data['end_date'])) {
+            FilmRelease::create([
+                'film_id' => $films->id,
+                'release_date' => $data['release_date'],
+                'end_date' => $data['end_date'],
+                'label' => 'Khởi chiếu lần 1',
+            ]);
+        }
+
         return new FilmResource($films);
     }
 
@@ -53,6 +64,7 @@ class FilmController extends Controller
         if (!$films) {
             return response()->json(['error_code' => 404, 'message' => 'Mã lỗi 404: Không tìm film.'], 404);
         }
+        $films->load('releases');
         return new FilmResource($films);
     }
 

@@ -18,6 +18,7 @@ use App\Models\Film;
 use App\Models\Categories;
 use App\Models\CategoryDetail;
 use App\Models\FilmMaker;
+use App\Models\FilmRelease;
 
 class FetchMoviesFromOMDb implements ShouldQueue
 {
@@ -111,6 +112,14 @@ class FetchMoviesFromOMDb implements ShouldQueue
             'end_date' => $endDate,
             'description' => $data['Plot'] ?? '',
             'status' => 1
+        ]);
+
+        // Auto-create the first film release
+        FilmRelease::create([
+            'film_id' => $film->id,
+            'release_date' => $releaseDate,
+            'end_date' => $endDate,
+            'label' => 'Khởi chiếu lần 1',
         ]);
 
         // --- 2. Categories (Genres) ---
