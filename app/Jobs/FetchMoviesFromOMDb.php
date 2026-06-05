@@ -86,11 +86,8 @@ class FetchMoviesFromOMDb implements ShouldQueue
             return;
         }
 
-        // Parsing Date
+        // Parsing Date (Always start from today as requested)
         $releaseDate = date('Y-m-d');
-        if ($data['Released'] !== 'N/A') {
-            $releaseDate = date('Y-m-d', strtotime($data['Released']));
-        }
         $endDate = date('Y-m-d', strtotime($releaseDate . ' + 45 days'));
 
         // Parsing Time (136 min -> 136)

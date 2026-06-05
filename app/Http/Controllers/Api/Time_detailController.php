@@ -43,7 +43,7 @@ return TimeDetailResource::collection($TimeDetail);
         if($check_time_detail){
             return response([
                 'message' => 'Suất chiếu '. $ngay_format .' '.$check_time_detail->time .' đã tồn tại',
-            ], 401);
+            ], 400);
 
         }
         // Định nghĩa các quy tắc validation

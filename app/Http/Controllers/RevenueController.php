@@ -107,6 +107,7 @@ class RevenueController extends Controller
         $endMonth = $monthsWithData->max();
         $Revenue_by_cinema_in_the_month = [];
         for ($months = 1; $months <= 12; $months++) {
+            $dailyRevenues = [];
             foreach ($cinemas as $cinema) {
                 $ticketInfo =  DB::table('book_tickets')
                     ->join('movie_chairs', 'book_tickets.id_chair', '=', 'movie_chairs.id')
@@ -164,6 +165,7 @@ class RevenueController extends Controller
         $endYear = $yearsWithData->max();
         $Revenue_by_cinema_in_the_year = [];
         for ($currentYear = $startYear; $currentYear <= $endYear; $currentYear++) {
+            $dailyRevenues = [];
             foreach ($cinemas as $cinema) {
                 $ticketInfo =  DB::table('book_tickets')
                 ->join('movie_chairs', 'book_tickets.id_chair', '=', 'movie_chairs.id')
@@ -201,7 +203,7 @@ class RevenueController extends Controller
                     'total_food_price' => intval($foodPrice),
                 ];
             }
-            $Revenue_by_cinema_in_the_year['2023'] = $dailyRevenues;
+            $Revenue_by_cinema_in_the_year[$currentYear] = $dailyRevenues;
             // Lưu kết quả vào mảng
         }
         $query =  DB::table('book_tickets')

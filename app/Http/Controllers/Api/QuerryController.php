@@ -149,15 +149,25 @@ class QuerryController extends Controller
         }
         // Đặt lại dữ liệu vào Cache
         Cache::put('seat_reservation', $seat_reservation);
+        $reservedSeats = [];
+        foreach ($seat_reservation as $showtimeId => $check) {
+            foreach ($check as $id_user => $userData) {
+                $userSeats = $userData['seat'];
+                foreach ($userSeats as $seat) {
+                    $reservedSeats[] = [
+                        'seat' => $seat,
+                        'id_user' => $id_user,
+                        'id_time_detail' => $showtimeId
+                    ];
+                }
+            }
+        }
         try {
             $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
                 'cluster' => env('PUSHER_APP_CLUSTER'),
                 'useTLS' => true,
             ]);
-
-            $pusher->trigger('Cinema', 'check-Seat', [
-                $seat_reservation[$id_time_detail],
-            ]);
+            $pusher->trigger('Cinema', 'SeatKepted', $reservedSeats);
         } catch (\Exception $e) {
             \Log::warning('Pusher notification failed: ' . $e->getMessage());
         }

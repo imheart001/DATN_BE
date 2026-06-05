@@ -28,6 +28,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:categories,name',
             'slug' => 'required|unique:categories,slug',
+            'status' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -58,6 +59,7 @@ class CategoryController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:categories,name,'.$id,
             'slug' => 'required|unique:categories,slug,'.$id,
+            'status' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

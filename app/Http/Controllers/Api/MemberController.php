@@ -30,6 +30,10 @@ class MemberController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->id_user != auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
         $data = member::where('id_user', $request->id_user)->first();
         if (!$data) {
             return response()->json(['message' => 'member not found'], 404);

@@ -15,7 +15,7 @@ class TimeController extends Controller
      */
     public function index()
     {
-        $time = time::all();
+        $time = Time::all();
         return TimeResource::collection($time);
     }
 
@@ -30,7 +30,7 @@ class TimeController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $time = time::create($request->all());
+        $time = Time::create($request->all());
         return new TimeResource($time);
     }
 
@@ -39,7 +39,7 @@ class TimeController extends Controller
      */
     public function show(string $id)
     {
-        $time = time::find($id);
+        $time = Time::find($id);
         if (!$time) {
             return response()->json(['message' => 'time not found'], 404);
         }
@@ -51,7 +51,7 @@ class TimeController extends Controller
      */
     public function update(Request $request, string $id)
     {   
-        $time = time::find($id);
+        $time = Time::find($id);
          
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:times,time,'.$id,
@@ -71,7 +71,7 @@ class TimeController extends Controller
      */
     public function destroy(string $id)
     {
-        $time = time::find($id);
+        $time = Time::find($id);
         if (!$time) {
             return response()->json(['message' => 'time not found'], 404);
         }

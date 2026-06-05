@@ -25,11 +25,8 @@ class BookTicketDetailsEmail extends Mailable
     use Queueable, SerializesModels;
     public function build()
     {
-        $currentUser = Auth::user();
+        $latestTicket = $this->latestTicket;
         $arr = [];
-        $latestTicket = Book_ticket::where('user_id', $currentUser->id)
-            ->latest('created_at')
-            ->first();
         $food_ticket_detail = DB::table('food_ticket_details as ftk')
             ->join('book_tickets as btk', 'ftk.book_ticket_id', '=', 'btk.id')
             ->join('food as f', 'ftk.food_id', '=', 'f.id')

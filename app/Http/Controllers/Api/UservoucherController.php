@@ -40,7 +40,7 @@ class UservoucherController extends Controller
         }
 
         // Kiểm tra số lượng sử dụng voucher
-        if ($voucher->remaining_limit == 0 && $this->getUsageCount($voucher->code) >= $voucher->remaining_limit) {
+        if ($voucher->remaining_limit !== null && $voucher->remaining_limit <= 0) {
             return response()->json(['message' => 'Số lượng người sử dụng voucher đã đạt tới giới hạn.'], 403);
         }
 

@@ -39,7 +39,7 @@ class FilmController extends Controller
         if ($request->hasFile('poster') && $request->file('poster')->isValid()) {
             $data['poster'] = uploadFile('image', $request->file('poster'));
         }
-        $films = film::create($data);
+        $films = Film::create($data);
 
         // Auto-create the first film release
         if (isset($data['release_date']) && isset($data['end_date'])) {
@@ -103,7 +103,7 @@ class FilmController extends Controller
      */
     public function destroy(string $id)
     {
-        $fims = film::find($id);
+        $fims = Film::find($id);
         if (!$fims) {
             return response()->json(['error_code' => 404, 'message' => 'Mã lỗi 404: Không tìm thấy film.'], 404);
         }

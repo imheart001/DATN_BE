@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Validation\Rule;
 use App\Models\voucher;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\voucherResource;
+use App\Http\Resources\VoucherResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +17,7 @@ class VoucherController extends Controller
     public function index()
     {
         $voucher = voucher::all();
-        return voucherResource::collection($voucher);
+        return VoucherResource::collection($voucher);
     }
 
     /**
@@ -47,7 +47,7 @@ class VoucherController extends Controller
         $data = $validator->validated();
 
         $voucher = voucher::create($data);
-        return new voucherResource($voucher);
+        return new VoucherResource($voucher);
     }
 
 
@@ -60,7 +60,7 @@ class VoucherController extends Controller
         if (!$voucher) {
             return response()->json(['message' => 'time not found'], 404);
         }
-        return new voucherResource($voucher);
+        return new VoucherResource($voucher);
     }
 
     /**
@@ -90,7 +90,7 @@ class VoucherController extends Controller
 
         $voucher->update($data);
 
-        return new voucherResource($voucher);
+        return new VoucherResource($voucher);
     }
 
 

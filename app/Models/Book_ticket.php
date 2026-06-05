@@ -26,7 +26,7 @@ class Book_ticket extends Model
 
     public function updateMemberTotalSpending()
     {   
-        $member = Member::where('id_user', $this->user_id)->first();
+        $member = member::where('id_user', $this->user_id)->first();
         if ($member) {
             $percent = 100;
             if($member->card_class == 2){

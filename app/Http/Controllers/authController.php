@@ -51,7 +51,7 @@ class authController extends Controller
         ]);
 
         // Tạo Member
-        $member = Member::create([
+        $member = member::create([
             'id_card' => sprintf('%08d', $user->id),
             'card_class' => 1,
             'activation_date' => now(),

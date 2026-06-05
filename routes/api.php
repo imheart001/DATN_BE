@@ -56,7 +56,7 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
 //đăng kí
 Route::post('/signup', [authController::class, 'sign_up']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [authController::class, 'login']);
 
 
 //
@@ -74,12 +74,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('refund_coin/{id}', [QuerryController::class, 'refund_coin']); // Hoàn tiền vào ví coin 70%
     //nhớ chú ý đến token khi login sai là không chạy được hết nhé 
     //nếu lỗi không chạy được thì login  lại và nhập lại token 
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [authController::class, 'logout']);
     Route::post('/send-book-ticket-details-email', [EmailController::class, 'sendBookTicketDetailsEmail']); // router cho vào sau khi thanh toán
     Route::post('/sendEmail', [EmailController::class, 'sendEmail']); //không cần qtam cái này đừng ai xóa  
     Route::post('/usevoucher', [UservoucherController::class, 'useVoucher']);
     Route::resource('rateStar', RateStarController::class);
     Route::get('/film-ratings/{film_id}',[RateStarController::class, 'getRatings']);
+    Route::apiResource('member', MemberController::class);
+    Route::post('cache_seat', [QuerryController::class, 'cache_seat']);
+    Route::get('getReservedSeatsByTimeDetail', [QuerryController::class, 'getReservedSeatsByTimeDetail']);
+    Route::post('Payment', [PaymentController::class, 'vnpay_payment']);
+    Route::post('momo_payment', [PaymentController::class, 'momo_payment']);
+    Route::post('post_money', [PaymentController::class, 'post_money']);
+    Route::post('coin_payment', [PaymentController::class, 'coin_payment']);
+    Route::apiResource('Chairs', ChairsController::class);
+    Route::apiResource('Food_ticket_detail', Food_ticket_detailController::class);
+    Route::apiResource('Book_ticket', Book_ticketController::class);
 });
 Route::get('/rating_avgs',[RateStarController::class, 'ratingAvg']); // đánh giá trung bình phim
 
@@ -94,8 +104,7 @@ Route::get('chair_count', [QuerryController::class, 'chair_count']);   // Lấy 
 Route::get('categorie_detail_name', [QuerryController::class, 'categorie_detail_name']); // Lấy danh mục của phim (ví dụ: Hành động, Kinh điển)
 Route::get('chair_by_time_detail', [QuerryController::class, 'chair_by_time_detail']);
 
-Route::post('cache_seat', [QuerryController::class, 'cache_seat']); // Thêm, xóa giữ ghế
-Route::get('getReservedSeatsByTimeDetail', [QuerryController::class, 'getReservedSeatsByTimeDetail']); // check xem có bao nhiêu ghế đang được giữ
+
 
 Route::get('purchase_history_ad', [QuerryController::class, 'purchase_history_ad']); // chi tiết vé a   min
 Route::get('purchase_history_ad_cinema/{id_cinema}', [QuerryController::class, 'purchase_history_ad_cinema']); // chi tiết vé a   min
@@ -113,23 +122,15 @@ Route::get('get_room_by_id_cinema/{id}', [QuerryController::class, 'get_room_by_
 Route::get('get_time_detail_by_id_cinema/{id_cinema}', [Time_detailController::class, 'get_time_detail_by_id_cinema']);
 
 ///////
-Route::post('Payment', [PaymentController::class, 'vnpay_payment']); // thanh toán VNPAY
 
-Route::post('momo_payment', [PaymentController::class, 'momo_payment']); // thanh toán momo
-
-Route::post('post_money', [PaymentController::class, 'post_money']); //napj tien qua momo
-
-Route::post('coin_payment', [PaymentController::class, 'coin_payment']); // thanh toán coin_payment
 
 ///////
 
-Route::apiResource('Chairs', ChairsController::class);
+
 Route::apiResource('Cinemas', CinemasController::class);
 Route::apiResource('Category', CategoryController::class);
 Route::apiResource('Banner', BannerController::class);
 Route::apiResource('Blogs', BlogsController::class);
-Route::apiResource('Food_ticket_detail', Food_ticket_detailController::class);
-Route::apiResource('Book_ticket', Book_ticketController::class);
 Route::apiResource('Contact', Contact_infosController::class);
 Route::apiResource('FeedBack', FeedbackController::class);
 Route::apiResource('Food', FoodController::class);
@@ -147,7 +148,7 @@ Route::resource('user', UsersController::class);
 // //api add vocher
 Route::resource('voucher', VoucherController::class);
 Route::resource('user', UsersController::class);
-Route::apiResource('member', MemberController::class);
+
 
 //thùng rác và khôi phục 
 
