@@ -87,13 +87,16 @@ return TimeDetailResource::collection($TimeDetail);
         }
         $rules = [];
         if ($request->date) {
-            $rules = [
-                'date' => [
-                    'required',
-                    'date',
-                    'after_or_equal:' . now()->format('Y-m-d'),
-                ],
-            ];
+            $existingDate = \Carbon\Carbon::parse($timeDetail->date)->format('Y-m-d');
+            if ($request->date !== $existingDate) {
+                $rules = [
+                    'date' => [
+                        'required',
+                        'date',
+                        'after_or_equal:' . now()->format('Y-m-d'),
+                    ],
+                ];
+            }
         }
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
