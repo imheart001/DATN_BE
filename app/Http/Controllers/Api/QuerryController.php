@@ -543,56 +543,8 @@ class QuerryController extends Controller
     }
     public function refund_coin(Request $request, $id)
     {
-        $now = Carbon::now('Asia/Ho_Chi_Minh');
-
-        $startOfMonth = Carbon::now()->startOfMonth();
-        // Lấy ngày cuối cùng của tháng hiện tại
-        $endOfMonth = Carbon::now()->endOfMonth();
-        // Sử dụng whereBetween để xác định khoảng thời gian
-        $status = Book_ticket::find($id);
-        $check_time = DB::table('time_details')->join('times', 'time_details.time_id', '=', 'times.id')
-            ->where('time_details.id', $status->id_time_detail)
-            ->get()->first();
-        $dateTimeString = $check_time->date . ' ' . $check_time->time;
-        $check = Book_ticket::where('user_id', $status->user_id)
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->where('status', 2)
-            ->count();
-        if ($check >= 2) {
-            return response([
-                'message' => 'Bạn đã hủy tối đa trong tháng này !',
-            ], 403);
-        }
-        // Tạo đối tượng Carbon từ chuỗi datetime
-        $dateTime = Carbon::parse($dateTimeString);
-        // Chuyển đổi thành timestamp
-        // So sánh với thời điểm hiện tại
-        $twoHoursAgo = $dateTime->subHours(2);
-        if ($status && !$now->gte($twoHoursAgo)) {
-            $refund_coins = User::find($status->user_id);
-            if (Hash::check($request->input('password'), $refund_coins->password)) {
-                if (!$status) {
-                    return response([
-                        'message' => 'Vé không tồn tại !',
-                    ], 403);
-                }
-                $cancel_chair = Chairs::find($status->id_chair);
-                if (!$cancel_chair) {
-                    return response([
-                        'message' => 'Ghế không tồn tại hoặc đã hủy !',
-                    ], 403);
-                }
-                $cancel_chair->delete();
-                $update = $status->update(['status' => 2]);
-                $coin_usage = $refund_coins->coin;
-                $amount = intval(($status->amount *= 0.7)) + $coin_usage;
-                $refund_coins->update(['coin' => $amount]);
-                return response()->json(['message' => "Hủy thành công, số coin " . intval($status->amount *= 0.7) . " đã được hoàn vào ví coin của bạn"], 200);
-            } else {
-                return response()->json(['message' => 'Nhập sai mật khẩu, vui lòng thử lại!'], 403);
-            }
-        } else {
-            return response()->json(['message' => 'Vé không tồn tại hoặc đã quá thời gian hủy vé!'], 403);
-        }
+        return response()->json([
+            'message' => 'Tính năng hoàn vé đã ngừng hoạt động từ ngày 08/06/2026!'
+        ], 403);
     }
 }

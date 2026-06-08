@@ -108,7 +108,6 @@ Route::get('chair_by_time_detail', [QuerryController::class, 'chair_by_time_deta
 
 Route::get('purchase_history_ad', [QuerryController::class, 'purchase_history_ad']); // chi tiết vé a   min
 Route::get('purchase_history_ad_cinema/{id_cinema}', [QuerryController::class, 'purchase_history_ad_cinema']); // chi tiết vé a   min
-Route::get('purchase_history_ad_refund', [QuerryController::class, 'purchase_history_ad_refund']); // chi tiết vé a   min
 Route::get('purchase_history_user/{id}', [QuerryController::class, 'purchase_history_user']); // chi tiết vé user
 
 Route::get('QR_book/{id}', [QuerryController::class, 'QR_book_tiket']);       
