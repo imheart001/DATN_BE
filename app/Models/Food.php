@@ -10,5 +10,5 @@ class Food extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = "food"; // phải điền đúng tên bảng mà mình cần trỏ tới trong csdl
-    protected $fillable = ['id', 'name', 'image', 'price'];
+    protected $fillable = ['id', 'name', 'image', 'price', 'description', 'quantity'];
 }

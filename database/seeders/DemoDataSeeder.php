@@ -399,18 +399,20 @@ class DemoDataSeeder extends Seeder
     private function seedFood(): array
     {
         $foods = [
-            'Combo Popcorn 1' => ['45000', 'combo-popcorn-1'],
-            'Combo Popcorn 2' => ['69000', 'combo-popcorn-2'],
-            'Coca Cola' => ['25000', 'coca-cola'],
-            'Pepsi' => ['25000', 'pepsi'],
-            'Nachos' => ['55000', 'nachos'],
+            'Combo Popcorn 1' => ['45000', 'combo-popcorn-1', '1 Bắp ngọt lớn + 1 Nước ngọt Coca Cola 22oz', 100],
+            'Combo Popcorn 2' => ['69000', 'combo-popcorn-2', '1 Bắp ngọt lớn + 2 Nước ngọt Coca Cola 22oz', 100],
+            'Coca Cola' => ['25000', 'coca-cola', 'Nước ngọt Coca Cola lon mát lạnh 330ml', 150],
+            'Pepsi' => ['25000', 'pepsi', 'Nước ngọt Pepsi lon mát lạnh 330ml', 150],
+            'Nachos' => ['55000', 'nachos', 'Bánh khoai tây chiên giòn kèm xốt phô mai', 80],
         ];
 
         $ids = [];
-        foreach ($foods as $name => [$price, $seed]) {
+        foreach ($foods as $name => [$price, $seed, $desc, $qty]) {
             $ids[$name] = $this->upsert('food', ['name' => $name], [
                 'image' => "https://picsum.photos/seed/{$seed}/300/300",
                 'price' => $price,
+                'description' => $desc,
+                'quantity' => $qty,
                 'deleted_at' => null,
             ]);
         }
