@@ -49,7 +49,7 @@ class RateStarController extends Controller
 
     if($film_bought){
         if(!empty($check)){
-            return response(['message' => "Mỗi khách hàng chỉ được đánh giá 1 lần"]);
+            return response()->json(['message' => "Mỗi khách hàng chỉ được đánh giá 1 lần"], 422);
         }
         $rating = RateStar::create([
             'user_id' => $user->id,//lấy khi login
@@ -60,7 +60,7 @@ class RateStarController extends Controller
         return response()->json(['message' => 'Bình luận và đánh giá đã được thêm mới.', 'data' => $rating]);
     }
    
-    return response()->json(['message' => 'Chỉ khách hàng đã xem phim này mới được đánh giá'],301);
+    return response()->json(['message' => 'Chỉ khách hàng đã xem phim này mới được đánh giá'], 403);
     
     // Tạo mới bình luận và đánh giá
     
@@ -69,64 +69,59 @@ class RateStarController extends Controller
     //số lượng đánh giá sao
     public function getRatings($film_id)
     {   
-        $user = auth()->user();
         // Lấy tất cả đánh giá cho bộ phim có film_id tương ứng
-        $ratings = DB::table('rate_stars')->join('films','films.id', '=', 'rate_stars.film_id')
-        ->join('users','users.id', '=', 'rate_stars.user_id')
-        ->where('film_id', $film_id)->
-        select('rate_stars.*',
-        'users.name as name_user' ,
-        'users.image as image' )->get();
+        $ratings = DB::table('rate_stars')
+            ->join('films', 'films.id', '=', 'rate_stars.film_id')
+            ->join('users', 'users.id', '=', 'rate_stars.user_id')
+            ->where('film_id', $film_id)
+            ->select('rate_stars.*', 'users.name as name_user', 'users.image as image')
+            ->get();
+
         // Tính trung bình số sao
         $averageStars = $ratings->avg('star');
+        $averageStars = $averageStars ? round($averageStars, 1) : 0;
+
         // Lấy số sao và comment mà user đang đăng nhập đã đánh giá (nếu có)
         $userRating = null;
+        $user = null;
         if (auth()->check()) {
-            $userId = auth()->user()->id;
-            $userRating = $ratings->where('user_id', $userId)->first();
+            $user = auth()->user();
+            $userRating = $ratings->where('user_id', $user->id)->first();
         }
+
         $response = [
             'totalReviews' => $ratings->count(),
             'averageStars' => $averageStars,
         ];
+
         // Thêm thông tin đánh giá của user vào response
-        if ($userRating) {
+        if ($userRating && $user) {
             $response['userRating'] = [
                 'image' => $user->image,
-                'name_user' =>$user->name,
+                'name_user' => $user->name,
                 'star' => $userRating->star,
                 'comment' => $userRating->comment,
                 'created_at' => $userRating->created_at
             ];
         }
+
         // Thêm tất cả đánh giá vào response
         $response['allRatings'] = $ratings;
         return response()->json($response);
     }
+
     public function ratingAvg()
     {   
+        // Nhóm điểm đánh giá trung bình theo từng phim tại database để trả về kết quả chính xác và nhẹ payload
         $ratings = DB::table('rate_stars')
-    ->join('films', 'films.id', '=', 'rate_stars.film_id')
-    ->select('films.id as film_id', 'rate_stars.star')
-    ->get();
+            ->select('film_id', DB::raw('ROUND(AVG(star), 1) as star'))
+            ->groupBy('film_id')
+            ->get();
 
-    $averageStars = $ratings->avg('star');
+        $response = [
+            'filmRatings' => $ratings,
+        ];
 
-// Assuming you have a user ID available (replace 'USER_ID' with the actual user ID)
-    $userID = 'USER_ID';
-
-// Retrieve the user's rating for each film
-    $userRatings = DB::table('rate_stars')
-    ->where('user_id', $userID)
-    ->pluck('star', 'film_id');
-$response = [
-    'filmRatings' => $ratings,
-];
-
-
-        // Thêm thông tin đánh giá của user vào response
-        
-        // Thêm tất cả đánh giá vào response
         return response()->json($response);
     }
 
