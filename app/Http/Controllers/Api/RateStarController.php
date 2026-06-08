@@ -54,7 +54,7 @@ class RateStarController extends Controller
         $rating = RateStar::create([
             'user_id' => $user->id,//lấy khi login
             'film_id' => $request->film_id, // 
-            'star' => $request->star_rating,//đánh giá sao
+            'star_rating' => $request->star_rating,//đánh giá sao
             'comment' => $request->comment, //comment
         ]);
         return response()->json(['message' => 'Bình luận và đánh giá đã được thêm mới.', 'data' => $rating]);
@@ -74,7 +74,16 @@ class RateStarController extends Controller
             ->join('films', 'films.id', '=', 'rate_stars.film_id')
             ->join('users', 'users.id', '=', 'rate_stars.user_id')
             ->where('film_id', $film_id)
-            ->select('rate_stars.*', 'users.name as name_user', 'users.image as image')
+            ->select(
+                'rate_stars.id',
+                'rate_stars.user_id',
+                'rate_stars.film_id',
+                'rate_stars.comment',
+                'rate_stars.star_rating as star',
+                'rate_stars.created_at',
+                'users.name as name_user',
+                'users.image as image'
+            )
             ->get();
 
         // Tính trung bình số sao
@@ -114,7 +123,7 @@ class RateStarController extends Controller
     {   
         // Nhóm điểm đánh giá trung bình theo từng phim tại database để trả về kết quả chính xác và nhẹ payload
         $ratings = DB::table('rate_stars')
-            ->select('film_id', DB::raw('ROUND(AVG(star), 1) as star'))
+            ->select('film_id', DB::raw('ROUND(AVG(star_rating), 1) as star'))
             ->groupBy('film_id')
             ->get();
 
