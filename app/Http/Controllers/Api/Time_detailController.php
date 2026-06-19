@@ -54,7 +54,12 @@ return TimeDetailResource::collection($TimeDetail);
                 'after_or_equal:' . now()->format('Y-m-d'),
             ],
         ];
-        $validator = Validator::make($request->all(), $rules);
+        $messages = [
+            'date.required' => 'Ngày chiếu không được để trống.',
+            'date.date' => 'Ngày chiếu không đúng định dạng.',
+            'date.after_or_equal' => 'Ngày chiếu phải lớn hơn hoặc bằng ngày hiện tại (' . now()->format('d/m/Y') . ').',
+        ];
+        $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
@@ -98,7 +103,12 @@ return TimeDetailResource::collection($TimeDetail);
                 ];
             }
         }
-        $validator = Validator::make($request->all(), $rules);
+        $messages = [
+            'date.required' => 'Ngày chiếu không được để trống.',
+            'date.date' => 'Ngày chiếu không đúng định dạng.',
+            'date.after_or_equal' => 'Ngày chiếu phải lớn hơn hoặc bằng ngày hiện tại (' . now()->format('d/m/Y') . ').',
+        ];
+        $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
