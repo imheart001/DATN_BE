@@ -14,6 +14,7 @@ use App\Models\Book_ticket;
 use Carbon\Carbon;
 use App\Models\Chairs;
 use Pusher\Pusher;
+use Illuminate\Support\Facades\Log;
 
 class QuerryController extends Controller
 {
@@ -169,7 +170,7 @@ class QuerryController extends Controller
             ]);
             $pusher->trigger('Cinema', 'SeatKepted', $reservedSeats);
         } catch (\Exception $e) {
-            \Log::warning('Pusher notification failed: ' . $e->getMessage());
+            Log::warning('Pusher notification failed: ' . $e->getMessage());
         }
 
         return $seat_reservation[$id_time_detail];
@@ -210,7 +211,7 @@ class QuerryController extends Controller
                 $reservedSeats,
             );
         } catch (\Exception $e) {
-            \Log::warning('Pusher notification failed: ' . $e->getMessage());
+            Log::warning('Pusher notification failed: ' . $e->getMessage());
         }
 
         return $reservedSeats;

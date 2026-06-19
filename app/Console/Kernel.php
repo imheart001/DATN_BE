@@ -14,6 +14,7 @@ use App\Models\Book_ticket;
 use Carbon\Carbon;
 use App\Models\Chairs;
 use Pusher\Pusher;
+use Illuminate\Support\Facades\Log;
 
 
 class Kernel extends ConsoleKernel
@@ -89,7 +90,7 @@ class Kernel extends ConsoleKernel
                                     $reservedSeats,
                                 );
                             } catch (\Exception $e) {
-                                \Log::warning('Pusher notification failed: ' . $e->getMessage());
+                                Log::warning('Pusher notification failed: ' . $e->getMessage());
                             }
                             
                         }
