@@ -82,6 +82,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/film-ratings/{film_id}',[RateStarController::class, 'getRatings']);
     Route::apiResource('member', MemberController::class);
     Route::post('cache_seat', [QuerryController::class, 'cache_seat']);
+    Route::post('clear_user_seats', [QuerryController::class, 'clear_user_seats']);
     Route::get('getReservedSeatsByTimeDetail', [QuerryController::class, 'getReservedSeatsByTimeDetail']);
     Route::post('Payment', [PaymentController::class, 'vnpay_payment']);
     Route::post('momo_payment', [PaymentController::class, 'momo_payment']);

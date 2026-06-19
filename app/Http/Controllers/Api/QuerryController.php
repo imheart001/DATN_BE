@@ -145,7 +145,7 @@ class QuerryController extends Controller
         } elseif (count(array_intersect($selected_seats, Arr::flatten($seat_reservation[$id_time_detail]))) === 0) {
             foreach ($selected_seats as $seat) {
                 $seat_reservation[$request->id_time_detail][$request->id_user]['seat'][$seat] = $seat;
-                $seat_reservation[$request->id_time_detail][$request->id_user]['time'][$seat] = $currentTime->addMinutes(1);
+                $seat_reservation[$request->id_time_detail][$request->id_user]['time'][$seat] = $currentTime->addMinutes(10);
             }
         }
         // Đặt lại dữ liệu vào Cache
@@ -176,6 +176,52 @@ class QuerryController extends Controller
         return $seat_reservation[$id_time_detail];
         // Trả về dữ liệu ghế và thời gian đã đặt
 
+    }
+
+    public function clear_user_seats(Request $request)
+    {
+        $id_time_detail = $request->id_time_detail;
+        $id_user = $request->id_user;
+
+        $seat_reservation = Cache::get('seat_reservation', []);
+
+        if (isset($seat_reservation[$id_time_detail][$id_user])) {
+            unset($seat_reservation[$id_time_detail][$id_user]);
+
+            // Dọn dẹp mảng nếu rỗng
+            if (empty($seat_reservation[$id_time_detail])) {
+                unset($seat_reservation[$id_time_detail]);
+            }
+
+            Cache::put('seat_reservation', $seat_reservation);
+
+            // Gửi cập nhật Pusher
+            $reservedSeats = [];
+            foreach ($seat_reservation as $showtimeId => $check) {
+                foreach ($check as $userId => $userData) {
+                    $userSeats = $userData['seat'] ?? [];
+                    foreach ($userSeats as $seat) {
+                        $reservedSeats[] = [
+                            'seat' => $seat,
+                            'id_user' => $userId,
+                            'id_time_detail' => $showtimeId
+                        ];
+                    }
+                }
+            }
+
+            try {
+                $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
+                    'cluster' => env('PUSHER_APP_CLUSTER'),
+                    'useTLS' => false,
+                ]);
+                $pusher->trigger('Cinema', 'SeatKepted', $reservedSeats);
+            } catch (\Exception $e) {
+                Log::warning('Pusher notification failed: ' . $e->getMessage());
+            }
+        }
+
+        return response()->json(['message' => 'Successfully cleared user seats cache']);
     }
 
     public function getReservedSeatsByTimeDetail()
