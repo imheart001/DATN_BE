@@ -143,6 +143,13 @@ class QuerryController extends Controller
             }
             //   Thêm ghế vào cache
         } elseif (count(array_intersect($selected_seats, Arr::flatten($seat_reservation[$id_time_detail]))) === 0) {
+            $user_current_seats = $seat_reservation[$id_time_detail][$request->id_user]['seat'] ?? [];
+            if (count($user_current_seats) + count($selected_seats) > 8) {
+                return response()->json([
+                    'message' => 'Bạn chỉ có thể chọn tối đa 8 ghế.'
+                ], 400);
+            }
+
             foreach ($selected_seats as $seat) {
                 $seat_reservation[$request->id_time_detail][$request->id_user]['seat'][$seat] = $seat;
                 $seat_reservation[$request->id_time_detail][$request->id_user]['time'][$seat] = $currentTime->addMinutes(10);
