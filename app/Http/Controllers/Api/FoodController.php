@@ -26,7 +26,11 @@ class FoodController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:food,name',
+            'name' => 'required|string|max:255|unique:food,name',
+            'price' => 'required|numeric|min:0|max:10000000',
+            'quantity' => 'required|integer|min:0|max:1000000',
+            'image' => 'required|string',
+            'description' => 'nullable|string|max:1000',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -57,7 +61,11 @@ class FoodController extends Controller
 
         $Food = Food::find($id);
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:food,name,'.$id,
+            'name' => 'required|string|max:255|unique:food,name,'.$id,
+            'price' => 'required|numeric|min:0|max:10000000',
+            'quantity' => 'required|integer|min:0|max:1000000',
+            'image' => 'required|string',
+            'description' => 'nullable|string|max:1000',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

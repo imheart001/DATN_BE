@@ -26,7 +26,8 @@ class CinemasController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:cinemas,name',
+            'name' => 'required|string|max:255|unique:cinemas,name',
+            'address' => 'required|string|max:500',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -55,7 +56,8 @@ class CinemasController extends Controller
     {
         $Cinemas = Cinemas::find($id);
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:cinemas,name,'.$id,
+            'name' => 'required|string|max:255|unique:cinemas,name,'.$id,
+            'address' => 'required|string|max:500',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

@@ -65,6 +65,8 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'string',
             'email' => 'string|email|unique:users,email,' . $user->id,
+            'role' => 'integer|in:0,1,2,3',
+            'id_cinema' => 'nullable|integer|exists:cinemas,id',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

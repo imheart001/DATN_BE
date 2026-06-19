@@ -285,8 +285,8 @@ class DemoDataSeeder extends Seeder
         $releaseValues = array_values($filmReleaseIds);
         $ids = [];
 
-        for ($i = 0; $i < 10; $i++) {
-            $date = $this->now->copy()->addDays(intdiv($i, 2))->toDateString();
+        for ($i = 0; $i < 60; $i++) {
+            $date = $this->now->copy()->addDays(intdiv($i, 6))->toDateString();
             $key = "demo-showtime-{$i}";
             $filmId = $filmValues[$i % count($filmValues)];
 

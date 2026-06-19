@@ -17,7 +17,7 @@ class FilmController extends Controller
      */
     public function index()
     {
-        $fims = Film::all();
+        $fims = Film::with('releases')->get();
         return FilmResource::collection($fims);
     }
 
@@ -25,9 +25,12 @@ class FilmController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {   $validator = Validator::make($request->all(), [
+    {
+        $validator = Validator::make($request->all(), [
         'name' => 'required|unique:films,name',
         'slug' => 'required|unique:films,slug',
+        'time' => 'required|integer|min:1|max:1000',
+        'limit_age' => 'required|integer|min:0|max:100',
     ]);
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
@@ -76,8 +79,10 @@ class FilmController extends Controller
         $data = $request->all();
         $films = Film::find($id);
         $validator = Validator::make($request->all(), [
-            'name' => 'required|unique:categories,name,'.$id,
-            'slug' => 'required|unique:categories,slug,'.$id,
+            'name' => 'required|unique:films,name,'.$id,
+            'slug' => 'required|unique:films,slug,'.$id,
+            'time' => 'required|integer|min:1|max:1000',
+            'limit_age' => 'required|integer|min:0|max:100',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

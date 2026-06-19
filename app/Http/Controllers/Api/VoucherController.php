@@ -32,10 +32,10 @@ class VoucherController extends Controller
             ],
             'start_time' => 'required|date|after_or_equal:now',
             'end_time' => 'required|date|after:start_time',
-            'usage_limit' => 'required|integer|min:0',
-            'price_voucher' => 'required|integer|min:0',
+            'usage_limit' => 'required|integer|min:0|max:1000000',
+            'price_voucher' => 'required|integer|min:0|max:10000000',
             'limit' => 'required|integer|in:1,2',
-            'minimum_amount' => 'required|integer|min:0',
+            'minimum_amount' => 'required|integer|min:0|max:100000000',
             'percent' => 'required|integer|min:0|max:100',
             'description'=>'required'
         ]);
@@ -81,9 +81,11 @@ class VoucherController extends Controller
             ],
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
-            'usage_limit' => 'required|integer|min:0',
-            'price_voucher' => 'required|integer|min:0',
+            'usage_limit' => 'required|integer|min:0|max:1000000',
+            'price_voucher' => 'required|integer|min:0|max:10000000',
             'limit' => 'required|integer|in:1,2',
+            'minimum_amount' => 'required|integer|min:0|max:100000000',
+            'percent' => 'required|integer|min:0|max:100',
             'description'=>'required'
 
         ]);

@@ -230,7 +230,7 @@ class QuerryController extends Controller
             ->join('times as tm', 'tm.id', '=', 'td.time_id')
             ->join('movie_rooms as mv', 'mv.id', '=', 'td.room_id')
             ->join('cinemas as cms', 'cms.id', '=', 'mv.id_cinema')
-            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(quantity, " x ", name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
+            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(food_ticket_details.quantity, " x ", food.name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
                 $join->on('food_ticket_details.book_ticket_id', '=', 'bt.id');
             })
             ->leftJoin('users as staff', 'staff.id', '=', 'bt.id_staff_check')
@@ -321,12 +321,12 @@ class QuerryController extends Controller
             ->join('movie_chairs as mc', 'mc.id', '=', 'bt.id_chair')
             ->join('times', 'times.id', '=', 'td.time_id')
             ->join('users', 'users.id', '=', 'bt.user_id')
-            ->join('members', 'members.id_user', '=', 'bt.user_id')
+            ->leftJoin('members', 'members.id_user', '=', 'bt.user_id')
             ->join('films as fl', 'fl.id', '=', 'td.film_id')
             ->join('times as tm', 'tm.id', '=', 'td.time_id')
             ->join('movie_rooms as mv', 'mv.id', '=', 'td.room_id')
             ->join('cinemas as cms', 'cms.id', '=', 'mv.id_cinema')
-            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(quantity, " x ", name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
+            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(food_ticket_details.quantity, " x ", food.name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
                 $join->on('food_ticket_details.book_ticket_id', '=', 'bt.id');
             })
             ->leftJoin('users as staff', 'staff.id', '=', 'bt.id_staff_check')
@@ -363,12 +363,12 @@ class QuerryController extends Controller
             ->join('movie_chairs as mc', 'mc.id', '=', 'bt.id_chair')
             ->join('times', 'times.id', '=', 'td.time_id')
             ->join('users', 'users.id', '=', 'bt.user_id')
-            ->join('members', 'members.id_user', '=', 'bt.user_id')
+            ->leftJoin('members', 'members.id_user', '=', 'bt.user_id')
             ->join('films as fl', 'fl.id', '=', 'td.film_id')
             ->join('times as tm', 'tm.id', '=', 'td.time_id')
             ->join('movie_rooms as mv', 'mv.id', '=', 'td.room_id')
             ->join('cinemas as cms', 'cms.id', '=', 'mv.id_cinema')
-            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(quantity, " x ", name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
+            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(food_ticket_details.quantity, " x ", food.name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
                 $join->on('food_ticket_details.book_ticket_id', '=', 'bt.id');
             })
             ->leftJoin('users as staff', 'staff.id', '=', 'bt.id_staff_check')
@@ -408,12 +408,12 @@ class QuerryController extends Controller
             ->join('movie_chairs as mc', 'mc.id', '=', 'bt.id_chair')
             ->join('times', 'times.id', '=', 'td.time_id')
             ->join('users', 'users.id', '=', 'bt.user_id')
-            ->join('members', 'members.id_user', '=', 'bt.user_id')
+            ->leftJoin('members', 'members.id_user', '=', 'bt.user_id')
             ->join('films as fl', 'fl.id', '=', 'td.film_id')
             ->join('times as tm', 'tm.id', '=', 'td.time_id')
             ->join('movie_rooms as mv', 'mv.id', '=', 'td.room_id')
             ->join('cinemas as cms', 'cms.id', '=', 'mv.id_cinema')
-            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(quantity, " ", name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
+            ->leftJoin(DB::raw('(SELECT book_ticket_id, GROUP_CONCAT(CONCAT(food_ticket_details.quantity, " ", food.name)) as food_items FROM food_ticket_details JOIN food ON food.id = food_ticket_details.food_id GROUP BY book_ticket_id) as food_ticket_details'), function ($join) {
                 $join->on('food_ticket_details.book_ticket_id', '=', 'bt.id');
             })
             ->select(
