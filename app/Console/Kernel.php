@@ -54,12 +54,8 @@ class Kernel extends ConsoleKernel
             foreach ($seat_reservation as $id_time_detail => &$users) {
                 foreach ($users as $id_user => &$data) {
                     foreach ($data['time'] as $seat => $carbonObject) {
-                        // Extract timestamp from Carbon object
-                        $timestamp = $carbonObject->timestamp;
-                        // Calculate the difference in seconds
-                        $secondsDifference = $currentTime->diffInSeconds($carbonObject);
-                        // Nếu số giây vượt quá 1 phút, xóa thông tin ghế hết hạn
-                        if ($secondsDifference >= 60) {
+                        // Nếu thời gian hiện tại lớn hơn hoặc bằng thời gian hết hạn của ghế, tiến hành xóa
+                        if ($currentTime->greaterThanOrEqualTo($carbonObject)) {
                             unset($data['seat'][$seat]);
                             unset($data['time'][$seat]);
                             Cache::put('seat_reservation', $seat_reservation);
